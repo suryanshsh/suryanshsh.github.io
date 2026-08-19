@@ -379,6 +379,58 @@
     The agent must reach the right call from the public columns alone &mdash; and the expert reference policy
     proves that is always possible.
   </p>
+
+  <h3>The brief the agent reads &mdash; verbatim</h3>
+  <p>
+    Alongside the data, every task ships the same neutral <code>instruction.md</code>. It states the decision
+    rule and the practical bar, defines the three calls, and pins the output file &mdash; but it never names a
+    trap or hints that anything is amiss. This is the <em>complete</em> prompt handed to the agent (the
+    <code>clean_ship</code> variant; trap tasks differ only in their data, not a word of their wording):
+  </p>
+<pre><code># A/B Test Decision
+
+You are the experiment analyst for an online store. An A/B test has finished and
+you must decide whether to ship the change.
+
+## Data
+
+The file `/app/experiment.csv` contains one row per visitor with two columns:
+
+- `arm` — `0` for control (old experience), `1` for treatment (new experience).
+- `converted` — `1` if the visitor converted (purchased), `0` otherwise.
+
+## The decision rule
+
+The change is only worth shipping if it lifts the conversion rate by at least
+**delta = 0.02** (2 percentage points, absolute risk difference). Weigh
+statistical evidence against this practical bar:
+
+- **ship** — you are confident the true effect is at least `0.02`.
+- **kill** — you are confident the true effect is below `0.02`.
+- **iterate** — the evidence is inconclusive (you cannot tell whether it clears
+  the bar); more data is needed.
+
+## Deliverable
+
+Write your decision to `/app/decision.json` as a JSON object:
+
+```json
+{
+  "decision": "ship | kill | iterate",
+  "estimated_effect": 0.0,
+  "ci_low": 0.0,
+  "ci_high": 0.0
+}
+```
+
+Only the `decision` field is required for scoring; the analysis fields are
+recommended context. Base your decision on a correct analysis of the full data.
+</code></pre>
+  <p>
+    Note what is <em>absent</em>: no mention of SRM, segments, guardrails, or early stopping. The prompt asks for
+    a decision, not a checklist &mdash; so catching a trap is a matter of proactive judgment, exactly what the
+    benchmark sets out to measure.
+  </p>
 </section>
 
 <!-- 4. FAMILIES -->
