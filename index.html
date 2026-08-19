@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ==== EDIT ME: basic identity / SEO ==== -->
+  <title>Suryansh Shrivastava — Applied Scientist &amp; Research Engineer</title>
+  <meta name="description" content="Suryansh Shrivastava — Applied Scientist at Microsoft building LLM data, evaluation, and agent infrastructure. Résumé, projects, and random musings." />
+  <meta name="author" content="Suryansh Shrivastava" />
+  <meta name="theme-color" content="#1b4332" />
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Suryansh Shrivastava" />
+  <meta property="og:description" content="Applied Scientist at Microsoft · LLM evaluation &amp; agent infrastructure. Résumé, projects, and random musings." />
+  <meta property="og:url" content="https://suryanshsh.github.io/" />
+  <meta name="twitter:card" content="summary" />
+
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="canonical" href="https://suryanshsh.github.io/" />
+
+  <!-- Fonts: Fraunces (display serif · old money), EB Garamond (body serif), JetBrains Mono (geek/matrix accents) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=EB+Garamond:ital,wght@0,400..600;1,400..500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css?v=2" />
+</head>
+
+<body>
+  <!-- Subtle matrix rain lives behind the hero only -->
+  <canvas id="matrix" aria-hidden="true"></canvas>
+
+  <a class="skip-link" href="#resume">Skip to content</a>
+
+  <!-- ============================= NAV ============================= -->
+  <header class="nav" id="top">
+    <div class="wrap nav__inner">
+      <a class="brand" href="#top" aria-label="Home">
+        <span class="brand__mark">SS</span>
+        <span class="brand__name">suryansh<span class="dim">.sh</span></span>
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a href="#musings"><span class="idx">01</span> Musings</a>
+        <a href="#projects"><span class="idx">02</span> Projects</a>
+        <a href="#resume"><span class="idx">03</span> Résumé</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+          <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+          <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 7 7 0 1 0 20 14.5Z"/></svg>
+        </button>
+        <button id="menu-toggle" class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile">
+      <a href="#musings"><span class="idx">01</span> Musings</a>
+      <a href="#projects"><span class="idx">02</span> Projects</a>
+      <a href="#resume"><span class="idx">03</span> Résumé</a>
+      <a href="#contact"><span class="idx">04</span> Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============================= HERO ============================= -->
+    <section class="hero wrap" id="home">
+      <p class="kicker reveal">// applied scientist · llm &amp; evaluation research</p>
+      <h1 class="hero__title reveal">
+        Suryansh<br />Shrivastava
+      </h1>
+      <p class="hero__lede reveal">
+        I build LLM data, evaluation, and agent infrastructure — synthetic-data
+        generation, LLM-as-a-judge systems, rubric design, and reinforcement
+        learning. Currently an Applied Scientist at Microsoft, shipping Copilot
+        experiences to millions. I like owning ambiguous, zero-to-one problems
+        end to end.
+      </p>
+
+      <div class="hero__cta reveal">
+        <a class="btn btn--solid" href="#resume">Read the résumé</a>
+        <a class="btn btn--ghost" href="#contact">Get in touch</a>
+      </div>
+
+      <p class="status reveal">
+        <span class="dot"></span>
+        <span class="mono">Applied Scientist · Microsoft · Hyderabad</span>
+        <span class="caret" aria-hidden="true">▋</span>
+      </p>
+    </section>
+
+    <!-- ============================= MUSINGS ============================= -->
+    <section class="section wrap" id="musings">
+      <header class="section__head reveal">
+        <span class="section__idx mono">01</span>
+        <h2 class="section__title">Random Musings</h2>
+        <p class="section__sub">Unpolished notes on software, systems, and the odd tangent.</p>
+      </header>
+
+      <div class="musings">
+        <!-- ==== EDIT ME: musing entries ==== -->
+        <article class="musing reveal">
+          <span class="musing__date mono">2026 · 08 · 19</span>
+          <div class="musing__body">
+            <h3>OCE-Bench — Can an AI analyst resist a tempting A/B test?</h3>
+            <p>A benchmark of certified statistical traps for ship / kill / iterate decisions — and what happened when a frontier agent ran all 45 tasks through a real container harness.</p>
+            <a href="musings/" class="link-arrow">Read <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================= PROJECTS ============================= -->
+    <section class="section wrap" id="projects">
+      <header class="section__head reveal">
+        <span class="section__idx mono">02</span>
+        <h2 class="section__title">Projects</h2>
+        <p class="section__sub">Things I built because they needed to exist.</p>
+      </header>
+
+      <div class="grid">
+        <!-- ==== EDIT ME: swap the profile links below for exact repo / live URLs ==== -->
+        <article class="project card reveal">
+          <div class="project__top">
+            <h3>Smol Test Harness</h3>
+            <span class="project__year mono">2026</span>
+          </div>
+          <p>A Python + Docker harness that runs and compares five coding-agent CLIs (Claude Code, OpenCode, Copilot CLI, Codex, Pi) on repeatable tasks in isolated Linux containers. An arrange–act–score workflow with hidden tests and phase-separated scoring keeps evaluations honest; health checks, timeouts, and concurrent runs separate model failures from infra failures.</p>
+          <ul class="tags tags--tech"><li>Python</li><li>Docker</li><li>pytest</li><li>Linux</li></ul>
+          <div class="project__links">
+            <a href="https://github.com/dunnus" target="_blank" rel="noopener" class="link-arrow">GitHub <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+
+        <article class="project card reveal">
+          <div class="project__top">
+            <h3>Mo(ve)ments</h3>
+            <span class="project__year mono">2026</span>
+          </div>
+          <p>A full-stack platform that turns a topic and reference documents into structured "moments" — atomic units pairing slide content with a speaker script, timing, and narrative beat — editable inline and exported to PPTX. A source-verification layer fuzzy-matches every generated claim against the source text to catch hallucinated citations; a conversational co-director agent revises slides through a validated XML edit protocol, with prompt-injection defenses.</p>
+          <ul class="tags tags--tech"><li>Next.js</li><li>TypeScript</li><li>tRPC</li><li>PostgreSQL</li><li>Claude API</li></ul>
+          <div class="project__links">
+            <a href="https://github.com/dunnus" target="_blank" rel="noopener" class="link-arrow">GitHub <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+
+        <article class="project card reveal">
+          <div class="project__top">
+            <h3>Airy8</h3>
+            <span class="project__year mono">2025</span>
+          </div>
+          <p>A production AI-tool discovery platform with search, ranking, and analytics — solo-built and shipped. REST APIs on Node.js/Express over PostgreSQL + Prisma with migrations and indexing; OAuth 2.0 + JWT with role-based access control and rate limiting; deployed on Azure App Service with GitHub Actions CI/CD.</p>
+          <ul class="tags tags--tech"><li>TypeScript</li><li>Node.js</li><li>PostgreSQL</li><li>Azure</li></ul>
+          <div class="project__links">
+            <a href="https://airy8.com" target="_blank" rel="noopener" class="link-arrow">Visit <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+
+        <article class="project card reveal">
+          <div class="project__top">
+            <h3>Vasuki</h3>
+            <span class="project__year mono">2022</span>
+          </div>
+          <p>A two-agent grid RL environment built from scratch and registered with OpenAI Gym — modeled state and action spaces, engineered the reward distribution, and implemented a DQN agent (Atari DQN architecture) with an OpenCV interface for visualizing agent trajectories.</p>
+          <ul class="tags tags--tech"><li>Python</li><li>OpenAI Gym</li><li>OpenCV</li></ul>
+          <div class="project__links">
+            <a href="https://github.com/dunnus" target="_blank" rel="noopener" class="link-arrow">GitHub <span aria-hidden="true">↗</span></a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================= RÉSUMÉ ============================= -->
+    <section class="section wrap" id="resume">
+      <header class="section__head reveal">
+        <span class="section__idx mono">03</span>
+        <h2 class="section__title">Résumé</h2>
+        <p class="section__sub">The work, the study, the tools — and a copy to keep.</p>
+      </header>
+
+      <p class="resume__summary reveal">
+        Research-oriented engineer building LLM data, evaluation, and agent
+        infrastructure. Production experience with controlled synthetic-data
+        generation, LLM-as-a-judge evaluation systems, rubric design and
+        validation, Docker-based agent evaluation environments, and reinforcement
+        learning — comfortable owning ambiguous, zero-to-one problems end to end.
+      </p>
+
+      <div class="resume">
+        <!-- Left column: experience + education -->
+        <div class="resume__main">
+          <h3 class="resume__label mono reveal">Experience</h3>
+
+          <article class="entry reveal">
+            <div class="entry__meta">
+              <span class="mono">Jul 2024 — Present</span>
+              <span class="entry__loc mono">Hyderabad</span>
+            </div>
+            <div class="entry__body">
+              <h4>Applied Scientist <span class="at">·</span> <span class="org">Microsoft</span></h4>
+              <p class="entry__team mono dim">Search, Assistant &amp; Intelligence</p>
+              <ul class="entry__points">
+                <li>Own M365 Copilot's SLM prompt-autocompletion end to end — integrated SLM outputs into the search and indexing architecture, generated 50K+ synthetic prompts via controlled data generation shaped to production traffic, and fine-tuned a 0.6B-parameter Qwen3 SLM for real-time completion. Deployed to <strong>3M+ users</strong>, improving Click Conversion Rate by <strong>150%</strong>.</li>
+                <li>Designed an LLM-as-a-judge evaluation framework for generation quality and Responsible AI, with an auto-research loop that proposes, tests, and refines judge rubrics against human labels — reaching <strong>Cohen's κ = 0.68</strong> agreement with annotators.</li>
+                <li>Led ranking and relevance experimentation for historical prompt suggestions via A/B testing, contributing to a <strong>65% CCR</strong> improvement across Copilot autocompletion.</li>
+                <li>Built LLM-powered internal agents automating partner onboarding and prompt-authoring workflows.</li>
+                <li>Parallelized constraint-index lookups to cut production latency <strong>37%</strong>; built functional test suites and monitoring dashboards for reliability and observability.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="entry reveal">
+            <div class="entry__meta">
+              <span class="mono">May — Aug 2023</span>
+              <span class="entry__loc mono">Noida</span>
+            </div>
+            <div class="entry__body">
+              <h4>Research Scientist Intern <span class="at">·</span> <span class="org">Adobe</span></h4>
+              <p class="entry__team mono dim">Media &amp; Data Science Research Lab</p>
+              <ul class="entry__points">
+                <li>Benchmarked and fine-tuned multimodal foundation models (LLaVA, MiniGPT-4, BLIP-2, LayoutLM) for document layout understanding using LoRA/QLoRA and distributed multi-GPU training (DP/DDP) on Linux clusters.</li>
+                <li>Designed layout-aware pretraining tasks and few-shot experiments to inject layout knowledge into language models, improving average IoU on layout parsing from <strong>22% → 48%</strong>.</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="entry reveal">
+            <div class="entry__meta">
+              <span class="mono">May — Jul 2022</span>
+              <span class="entry__loc mono">New Delhi</span>
+            </div>
+            <div class="entry__body">
+              <h4>Research Intern <span class="at">·</span> <span class="org">IIIT Delhi</span></h4>
+              <p class="entry__team mono dim">Networked Autonomous Systems Lab</p>
+              <ul class="entry__points">
+                <li>Built an autonomous-driving RL environment on SUMO with occupancy grids and the Intelligent Driver Model; defined observation, state, action, and reward spaces and trained a PPO agent over a bifurcated observation space of local and network-assisted views.</li>
+              </ul>
+            </div>
+          </article>
+
+          <h3 class="resume__label mono reveal" style="margin-top:2.8rem;">Education</h3>
+
+          <article class="entry reveal">
+            <div class="entry__meta">
+              <span class="mono">2020 — 2024</span>
+              <span class="entry__loc mono">Guwahati</span>
+            </div>
+            <div class="entry__body">
+              <h4>B.Tech, Electronics &amp; Electrical Eng. <span class="at">·</span> <span class="org">IIT Guwahati</span></h4>
+              <p>Relevant coursework: Reinforcement Learning, Data Structures &amp; Algorithms, Linear Algebra, Probability &amp; Random Processes, and Game Theory; Deep Learning &amp; NLP Specializations (DeepLearning.AI).</p>
+            </div>
+          </article>
+
+          <h3 class="resume__label mono reveal" style="margin-top:2.8rem;">Achievements</h3>
+
+          <ul class="achievements reveal">
+            <li><strong>Codeforces Candidate Master</strong> (three_nil) — rating 1906, peak 2040.</li>
+            <li><strong>JEE Advanced</strong> — All India Rank 1760 of 150,000+ (2020); JEE Mains rank 2796 of 1M+.</li>
+            <li><strong>KVPY Scholar</strong> — Government of India &amp; Indian Academy of Sciences, for research aptitude (2019).</li>
+            <li><strong>Astronomy Olympiad (NSEA)</strong> — national top 1% (2018); RMO — qualified for INMO, state top 30 (2017).</li>
+            <li><strong>IITG.ai Hackathon</strong> — 1st place for a deep-learning solution (2021).</li>
+          </ul>
+        </div>
+
+        <!-- Right column: skills + download -->
+        <aside class="resume__aside">
+          <div class="card reveal">
+            <h3 class="resume__label mono">Toolkit</h3>
+
+            <div class="skills">
+              <p class="skills__group">Languages</p>
+              <ul class="tags">
+                <li>Python</li><li>C++</li><li>TypeScript</li><li>SQL</li>
+              </ul>
+            </div>
+            <div class="skills">
+              <p class="skills__group">AI &amp; Evaluation</p>
+              <ul class="tags">
+                <li>LLM fine-tuning</li><li>LoRA / QLoRA</li><li>Synthetic data</li><li>LLM-as-a-judge</li><li>Rubric design</li><li>RL · DQN / PPO</li>
+              </ul>
+            </div>
+            <div class="skills">
+              <p class="skills__group">Frameworks</p>
+              <ul class="tags">
+                <li>PyTorch</li><li>Hugging Face</li><li>OpenAI Gym</li><li>scikit-learn</li><li>OpenCV</li><li>TensorFlow</li>
+              </ul>
+            </div>
+            <div class="skills">
+              <p class="skills__group">Infrastructure</p>
+              <ul class="tags">
+                <li>Docker</li><li>Linux</li><li>pytest</li><li>GitHub Actions</li><li>CI/CD</li><li>Azure</li><li>PostgreSQL</li>
+              </ul>
+            </div>
+
+            <a class="btn btn--solid btn--full" href="Suryansh_Shrivastava_Resume.pdf" download>Download CV <span aria-hidden="true">↓</span></a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============================= CONTACT ============================= -->
+    <section class="section wrap contact" id="contact">
+      <header class="section__head reveal">
+        <span class="section__idx mono">04</span>
+        <h2 class="section__title">Say hello</h2>
+        <p class="section__sub">Research, work, or just a good idea — I read everything.</p>
+      </header>
+
+      <!-- ==== EDIT ME: contact links ==== -->
+      <div class="contact__links reveal">
+        <a class="contact__link" href="mailto:me.suryansh22@gmail.com">
+          <span class="mono dim">email</span><span>me.suryansh22@gmail.com</span>
+        </a>
+        <a class="contact__link" href="https://github.com/suryanshsh" target="_blank" rel="noopener">
+          <span class="mono dim">github</span><span>@suryanshsh</span>
+        </a>
+        <a class="contact__link" href="https://github.com/dunnus" target="_blank" rel="noopener">
+          <span class="mono dim">github</span><span>@dunnus</span>
+        </a>
+        <a class="contact__link" href="https://www.linkedin.com/in/suryansh2262" target="_blank" rel="noopener">
+          <span class="mono dim">linkedin</span><span>/in/suryansh2262</span>
+        </a>
+        <a class="contact__link" href="https://codeforces.com/profile/three_nil" target="_blank" rel="noopener">
+          <span class="mono dim">codeforces</span><span>three_nil · CM</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================= FOOTER ============================= -->
+  <footer class="footer wrap">
+    <span class="mono dim">© <span id="year">2026</span> Suryansh Shrivastava</span>
+    <span class="mono dim">built with plain HTML, CSS &amp; a little JS · <span class="green">no frameworks</span></span>
+  </footer>
+
+  <script src="main.js?v=2"></script>
+</body>
+</html>
