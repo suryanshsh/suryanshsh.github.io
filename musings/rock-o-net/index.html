@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rock-o-net — Teaching an LSTM to Shred</title>
+<meta name="description" content="A build log for Rock-o-net: parsing electric-guitar tracks out of MIDI, training a stack of LSTMs on them, and sampling back new solos note by note." />
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=EB+Garamond:ital,wght@0,400..600;1,400..500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script>try{var t=localStorage.getItem("theme")||((window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light");document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<style>
+  :root{
+    --bg:#f4f1e9; --panel:#fbf9f2; --panel-2:#f0ecdf; --ink:#23281f; --ink-soft:#45443a; --muted:#6f6a58;
+    --line:#e0d9c6; --line-strong:#d8cfb8;
+    --accent:#1b4332; --accent-2:#2d6a4b; --accent-soft:rgba(27,67,50,.10);
+    --gold:#a9884f; --code-bg:rgba(27,67,50,.05);
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:"EB Garamond",Georgia,"Times New Roman",serif;
+    --serif:"Fraunces",Georgia,serif;
+    --wrap:900px;
+  }
+  [data-theme="dark"]{
+    --bg:#0b0e0b; --panel:#12160f; --panel-2:#0e120e; --ink:#e2e6d7; --ink-soft:#c3c8ba; --muted:#8b917f;
+    --line:#232a20; --line-strong:#2e372a;
+    --accent:#7bd39a; --accent-2:#9be7b4; --accent-soft:rgba(123,211,154,.13);
+    --gold:#c9a86a; --code-bg:rgba(255,255,255,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:19px;line-height:1.7;letter-spacing:.005em;-webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;transition:background .4s ease,color .4s ease;
+  }
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+  a{color:var(--accent)}
+  a:hover{text-decoration:underline}
+  ::selection{background:rgba(169,136,79,.28)}
+
+  /* nav */
+  header.nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);
+    backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line)}
+  header.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:16px}
+  .navleft{display:flex;align-items:center;gap:16px;min-width:0}
+  .back{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap}
+  .back:hover{color:var(--accent);text-decoration:none}
+  .brand{font-family:var(--serif);font-weight:600;font-size:16px}
+  .brand span{color:var(--accent)}
+  .ghlink{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap}
+  .ghlink:hover{color:var(--accent);text-decoration:none}
+  .navright{display:flex;align-items:center;gap:14px}
+  .themebtn{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--ink);cursor:pointer;flex:none}
+  .themebtn:hover{border-color:var(--accent)}
+  .i-moon{display:none}
+  [data-theme="dark"] .i-sun{display:none}
+  [data-theme="dark"] .i-moon{display:block}
+  @media(max-width:640px){.ghlink{display:none}}
+
+  /* hero */
+  .hero{padding:80px 0 40px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:20px}
+  h1{font-family:var(--serif);font-weight:400;font-size:52px;line-height:1.05;letter-spacing:-.015em;margin:0 0 22px;max-width:18ch}
+  .lede{font-size:21px;line-height:1.55;color:var(--ink-soft);max-width:60ch;margin:0}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:38px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .stat .n{font-family:var(--serif);font-size:30px;line-height:1;letter-spacing:-.02em}
+  .stat .l{font-size:12.5px;color:var(--muted);margin-top:8px;font-family:var(--mono)}
+  .stat.hl{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-soft),transparent)}
+  .stat.hl .n{color:var(--accent)}
+  @media(max-width:720px){h1{font-size:38px}.lede{font-size:19px}.statgrid{grid-template-columns:repeat(2,1fr)}}
+
+  /* sections */
+  section{padding:56px 0;border-bottom:1px solid var(--line)}
+  .sec-no{font-family:var(--mono);font-size:13px;color:var(--accent);letter-spacing:.1em;margin-bottom:10px}
+  h2{font-family:var(--serif);font-weight:500;font-size:31px;letter-spacing:-.01em;margin:0 0 6px}
+  h3{font-size:20px;font-weight:600;margin:30px 0 6px;font-family:var(--serif)}
+  p{margin:14px 0}
+  .lead{font-size:19.5px;color:var(--ink-soft)}
+  .muted{color:var(--muted)}
+  strong{font-weight:600}
+  em{color:var(--ink)}
+  ul.clean{margin:14px 0;padding-left:0;list-style:none}
+  ul.clean li{position:relative;padding-left:26px;margin:10px 0;color:var(--ink-soft)}
+  ul.clean li::before{content:"";position:absolute;left:4px;top:12px;width:7px;height:7px;border-radius:2px;background:var(--accent);transform:rotate(45deg)}
+  ul.clean li strong{color:var(--ink)}
+
+  /* note */
+  .note{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:16px 20px;margin:26px 0;font-size:16.5px;color:var(--ink-soft)}
+  .note b{color:var(--gold)}
+
+  /* code */
+  pre{background:#101216;color:#e9e7df;border-radius:12px;padding:18px 20px;overflow:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;margin:20px 0}
+  pre .c{color:#7f9a86}pre .k{color:#c9a86a}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:.06em .34em}
+  pre code{background:none;border:none;padding:0}
+
+  /* numbered recipe */
+  .recipe{margin:24px 0;display:grid;gap:12px}
+  .recipe .step{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px 14px 60px}
+  .recipe .step::before{content:attr(data-n);position:absolute;left:14px;top:13px;width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .recipe .step b{font-size:15.5px}
+  .recipe .step p{margin:4px 0 0;font-size:15px;color:var(--ink-soft);line-height:1.5}
+
+  /* pipeline */
+  .pipe{display:flex;align-items:stretch;gap:0;margin:26px 0;flex-wrap:wrap}
+  .pnode{flex:1 1 0;min-width:130px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
+  .pnode .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  .pnode .d{font-size:13px;color:var(--ink-soft);margin-top:6px;line-height:1.4}
+  .parrow{display:flex;align-items:center;justify-content:center;color:var(--line-strong);font-size:20px;padding:0 6px}
+  @media(max-width:720px){.parrow{transform:rotate(90deg);width:100%;height:24px}}
+
+  /* figure */
+  .fig{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin:28px 0;text-align:center}
+  .fig img{max-width:100%;height:auto;border-radius:8px}
+  .fig .cap{font-size:13.5px;color:var(--muted);margin-top:14px;border-top:1px dashed var(--line-strong);padding-top:12px;text-align:left}
+  .fig .cap b{color:var(--ink)}
+
+  /* footer */
+  footer{padding:48px 0 80px;color:var(--muted);font-size:15px}
+  footer .wrap>div{margin:6px 0}
+  footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="navleft">
+      <a class="back" href="../../">‹ suryansh.sh</a>
+      <div class="brand">Rock&#8209;o&#8209;<span>net</span></div>
+    </div>
+    <div class="navright">
+      <a class="ghlink" href="https://github.com/dunnus/Rock-o-net" target="_blank" rel="noopener">github ↗</a>
+      <button id="theme-toggle" class="themebtn" type="button" aria-label="Toggle color theme" title="Toggle theme">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 7 7 0 1 0 20 14.5Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Build log · 6 July 2022 · deep learning for music</div>
+    <h1>Rock-o-net: teaching an LSTM to shred</h1>
+    <p class="lede">
+      I wanted to know if a neural network could pick up the phrasing of a lead guitar and improvise its own.
+      Rock&#8209;o&#8209;net pulls electric&#8209;guitar tracks out of MIDI files, learns them with a stack of
+      LSTMs, and then samples back new solos one note at a time. Here is the whole pipeline — from a folder of
+      <code>.mid</code> files to a machine that riffs.
+    </p>
+    <div class="statgrid">
+      <div class="stat"><div class="n">2 × 256</div><div class="l">stacked LSTM units</div></div>
+      <div class="stat"><div class="n">100</div><div class="l">notes of context</div></div>
+      <div class="stat"><div class="n">600</div><div class="l">epochs · 3 LR sweeps</div></div>
+      <div class="stat hl"><div class="n">10</div><div class="l">solos sampled at the end</div></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- 1 -->
+<section id="idea">
+  <div class="sec-no">01 — THE IDEA</div>
+  <h2>Can a net learn to play lead?</h2>
+  <p class="lead">
+    A lead guitar line is just a sequence — this note, then the next, then the next — with a logic you can feel
+    but struggle to write down. That is exactly the shape of problem a recurrent network is good at: given the
+    last hundred notes, guess the next one. Do that well enough and you can let it run, feeding its own guesses
+    back in, until it has improvised a whole phrase.
+  </p>
+  <p>
+    So the goal was narrow and honest: model a guitar solo as a <strong>sequence of pitches</strong>, learn it
+    with LSTMs, and generate new sequences in the same voice. No rhythm model, no dynamics — just the melody and
+    harmony of the notes themselves.
+  </p>
+
+  <div class="pipe">
+    <div class="pnode"><div class="k">MIDI</div><div class="d">a folder of <code>.mid</code> songs</div></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><div class="k">Filter</div><div class="d">keep guitar tracks only</div></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><div class="k">Tokenise</div><div class="d">notes &amp; chords → strings</div></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><div class="k">Windows</div><div class="d">100 in, 1 out</div></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><div class="k">LSTM</div><div class="d">learn the next note</div></div>
+    <div class="parrow">→</div>
+    <div class="pnode"><div class="k">Sample</div><div class="d">back to a new <code>.mid</code></div></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="data">
+  <div class="sec-no">02 — THE DATA</div>
+  <h2>What a MIDI note actually is</h2>
+  <p class="lead">
+    MIDI — Musical Instrument Digital Interface — doesn't store audio. It stores <em>instructions</em>. A song is
+    a set of instruments (tracks), each track a list of notes, and each note is really three numbers:
+  </p>
+  <ul class="clean">
+    <li><strong>Pitch</strong> — which note (E4, A3, …).</li>
+    <li><strong>Volume</strong> — how hard it was struck.</li>
+    <li><strong>Time step</strong> — when it lands relative to the previous note.</li>
+  </ul>
+  <p>
+    Rock&#8209;o&#8209;net keeps only the <strong>pitch</strong>. That is a big simplification — it throws away
+    dynamics and timing — but it makes the modelling tractable: the whole song collapses into a clean stream of
+    note tokens, which is all the LSTM needs to start learning phrasing.
+  </p>
+</section>
+
+<!-- 3 -->
+<section id="parsing">
+  <div class="sec-no">03 — PARSING</div>
+  <h2>From <code>.mid</code> to tensors</h2>
+  <p class="lead">
+    All the real work of a deep-learning project is here, in <code>create_data.py</code>, using the wonderful
+    <a href="https://web.mit.edu/music21/" target="_blank" rel="noopener">music21</a> library to read scores.
+    The recipe, step by step:
+  </p>
+
+  <div class="recipe">
+    <div class="step" data-n="1"><b>Find the guitars.</b><p>Walk every <code>.mid</code> file and, using <code>partitionByInstrument</code>, keep only files that actually contain an <code>ElectricGuitar</code> track. The shortlist gets pickled so we never re-scan.</p></div>
+    <div class="step" data-n="2"><b>Flatten to tokens.</b><p>Recurse through each guitar part: a single <em>Note</em> becomes its pitch string (<code>"E4"</code>); a <em>Chord</em> becomes its pitches joined by spaces (<code>"E4 G4 B4"</code>). The song is now one long list of note tokens.</p></div>
+    <div class="step" data-n="3"><b>Slide a window.</b><p>Across that list, take windows of 101 tokens: the first <code>100</code> are the input <code>X</code>, the <code>101st</code> is the target <code>Y</code>. Predict the next note from the last hundred.</p></div>
+    <div class="step" data-n="4"><b>Toss the boring bits.</b><p>Keep a window only if it has more than <code>13</code> unique notes. Long repetitive runs teach the model nothing but how to repeat itself.</p></div>
+    <div class="step" data-n="5"><b>Encode &amp; standardise.</b><p>An <code>OrdinalEncoder</code> maps each token to an integer; <code>X</code> is standardised (subtract the mean, divide by the std) so the network trains cleanly.</p></div>
+    <div class="step" data-n="6"><b>One-hot the target.</b><p><code>Y</code> is one-hot encoded so we can train with categorical cross-entropy — the model outputs a probability over the whole note vocabulary. Everything is pickled for reuse.</p></div>
+  </div>
+
+  <pre><code><span class="c"># the heart of it — window the token stream into (X, Y) pairs</span>
+for i in range(0, idx - sequence_length):
+    if check_data(data[i:i+sequence_length]):        <span class="c"># &gt;13 unique notes?</span>
+        X.append(enc.transform(...data[i:i+sequence_length]))
+        Y.append(enc.transform(...data[i+sequence_length]))
+
+X = (X - X.mean()) / X.std()                          <span class="c"># standardise inputs</span>
+Y = OneHotEncoder().fit_transform(Y)                  <span class="c"># one-hot targets</span></code></pre>
+
+  <div class="note">
+    <b>The choice that echoes everywhere.</b> By keeping pitch and dropping volume and timing, every downstream
+    decision gets simpler — and the generated music inherits a flat, even rhythm. One line of data design shapes
+    the entire sound of the output.
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="model">
+  <div class="sec-no">04 — THE MODEL</div>
+  <h2>A short stack of LSTMs</h2>
+  <p class="lead">
+    Nothing exotic — two LSTM layers to carry the melodic memory, dropout to keep it honest, and a softmax head
+    that predicts a distribution over the note vocabulary.
+  </p>
+
+  <pre><code>model = Sequential()
+model.add(CuDNNLSTM(256, input_shape=input_shape, return_sequences=True))
+model.add(Dropout(0.3))
+model.add(CuDNNLSTM(256))
+model.add(Dense(128))
+model.add(Dropout(0.3))
+model.add(Dense(op_len, activation=<span class="k">"softmax"</span>))   <span class="c"># prob. over every note</span>
+
+opt = Adam(lr=lr, beta_1=0.9, beta_2=0.999, decay=0.01)
+model.compile(loss=<span class="k">'categorical_crossentropy'</span>, optimizer=opt, metrics=[<span class="k">'accuracy'</span>])</code></pre>
+
+  <p>
+    Cross-entropy is the natural loss here because the targets are one-hot: the network is really doing
+    <em>classification</em> over “which note comes next”. The two stacked <code>CuDNNLSTM</code> layers are the
+    GPU-accelerated flavour — fast to train, at the cost of pinning you to a CUDA device.
+  </p>
+
+  <div class="fig">
+    <img src="https://raw.githubusercontent.com/dunnus/Rock-o-net/main/object/model.png" alt="Rock-o-net model architecture diagram" loading="lazy" />
+    <div class="cap"><b>The architecture.</b> Two 256-unit LSTM layers with dropout, a 128-wide dense bottleneck, and a softmax over the note vocabulary.</div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="training">
+  <div class="sec-no">05 — TRAINING</div>
+  <h2>Three learning rates, 200 epochs each</h2>
+  <p class="lead">
+    Rather than guess a single learning rate, I swept three — <code>0.01</code>, <code>0.001</code> and
+    <code>0.0001</code> — and trained a fresh model for <code>200</code> epochs at each, saving the weights,
+    architecture and loss history every time.
+  </p>
+
+  <div class="fig">
+    <img src="https://raw.githubusercontent.com/dunnus/Rock-o-net/main/object/losschart.png" alt="Training loss across the three learning rates" loading="lazy" />
+    <div class="cap"><b>Loss vs. learning rate.</b> Categorical cross-entropy over 200 epochs at each of the three rates — the sweep makes it easy to see which schedule actually settles.</div>
+  </div>
+  <p class="muted">
+    A small irony worth owning: generation later loads the <code>lr = 0.01</code> model — the most aggressive of
+    the three. Picking the checkpoint by ear rather than by validation loss is exactly the kind of thing a
+    second pass would tighten.
+  </p>
+</section>
+
+<!-- 6 -->
+<section id="generate">
+  <div class="sec-no">06 — GENERATION</div>
+  <h2>Letting it improvise</h2>
+  <p class="lead">
+    Generation is autoregressive. Seed the model with a real 100-note window pulled at random from the training
+    data, ask it for the next note, glue that onto the end, drop the oldest note, and repeat. The window walks
+    forward through music the model is inventing as it goes.
+  </p>
+
+  <pre><code>notes = starting_notes                     <span class="c"># a real 100-note seed</span>
+for i in range(length):
+    p = model.predict(notes)
+    nxt = np.argmax(p[0])                   <span class="c"># greedy: take the top note</span>
+    <span class="c"># decode → standardise → slide the window forward one step</span>
+    notes = np.append(notes[0, 1:], nxt)...</code></pre>
+
+  <p>
+    Then the note tokens are turned back into a score: reverse the standardisation and the ordinal encoding, and
+    for each token build a <code>Note</code> — or, if the token holds spaces, a <code>Chord</code> — assign it an
+    electric-guitar voice, step the offset forward a fixed <code>0.3</code>, and write the lot out as a fresh
+    <code>.mid</code>. Ten solos, generated end to end.
+  </p>
+
+  <div class="note">
+    <b>Two honest tells.</b> The next note is chosen with <code>argmax</code> — greedy and deterministic, so a
+    given seed always plays the same solo — and every note is spaced by the same <code>0.3</code> offset, which
+    is why the output has that steady, metronomic feel. Both are direct consequences of modelling pitch alone.
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="next">
+  <div class="sec-no">07 — WHAT I'D DO DIFFERENTLY</div>
+  <h2>The honest to-do list</h2>
+  <ul class="clean">
+    <li><strong>Model rhythm and dynamics.</strong> Bring back the time-step and volume that step 2 threw away — a solo lives as much in its timing as its pitches.</li>
+    <li><strong>Sample with temperature.</strong> Swap the greedy <code>argmax</code> for probabilistic sampling so a single seed can branch into many different solos.</li>
+    <li><strong>Choose checkpoints by validation.</strong> Hold out data and pick the learning rate that generalises, instead of defaulting to <code>lr = 0.01</code>.</li>
+    <li><strong>Drop the CUDA lock-in.</strong> Plain <code>LSTM</code>/<code>GRU</code> layers would run anywhere; <code>CuDNNLSTM</code> was fast but tied the whole project to one kind of GPU.</li>
+  </ul>
+  <p class="muted">
+    None of it takes away from the fun of the first version: a network that had never been told what a guitar is,
+    quietly learning to string notes together into something that sounds like playing.
+  </p>
+</section>
+
+<!-- 8 -->
+<section id="run">
+  <div class="sec-no">08 — RUN IT YOURSELF</div>
+  <h2>Three commands</h2>
+  <pre><code><span class="c"># 1 · parse the MIDIs into training tensors</span>
+python create_data.py        <span class="c"># tweak sequence_length / unique_factor here</span>
+
+<span class="c"># 2 · train across the learning-rate sweep</span>
+python train.py
+
+<span class="c"># 3 · improvise new solos into music/</span>
+python generate.py</code></pre>
+  <p class="muted">
+    Source, the trained model, the architecture and loss charts, and a few generated clips all live in the repo:
+    <a href="https://github.com/dunnus/Rock-o-net" target="_blank" rel="noopener">github.com/dunnus/Rock-o-net</a>.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><strong>Rock-o-net</strong> — an LSTM-based rock guitar generator. Built July 2022.</div>
+    <div class="muted">Standing on the shoulders of <a href="https://github.com/jisungk/deepjazz" target="_blank" rel="noopener">deepjazz</a> and <a href="https://github.com/Skuldur/Classical-Piano-Composer" target="_blank" rel="noopener">Classical-Piano-Composer</a>.</div>
+    <div class="muted">← <a href="../../">back to suryansh.sh</a></div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var root=document.documentElement, btn=document.getElementById("theme-toggle");
+    if(!btn) return;
+    btn.addEventListener("click", function(){
+      var next=root.getAttribute("data-theme")==="dark"?"light":"dark";
+      root.setAttribute("data-theme", next);
+      try{localStorage.setItem("theme", next)}catch(e){}
+    });
+  })();
+</script>
+</body>
+</html>
